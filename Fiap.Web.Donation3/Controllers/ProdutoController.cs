@@ -30,19 +30,28 @@ namespace Fiap.Web.Donation3.Controllers
         [HttpPost]
         public IActionResult Editar(ProdutoModel produtoModel)
         {
-            if ( string.IsNullOrEmpty(produtoModel.Nome) )
+            var sucesso = true;
+            var mensagemErro = "";
+
+            if (string.IsNullOrEmpty(produtoModel.Nome))
             {
+                mensagemErro += "Nome do produto é obrigatório.";
+                sucesso = false;
+            }
 
-                ViewBag.MensagemErro = "O campo nome é obrigatório";
-                
+            if (string.IsNullOrEmpty(produtoModel.Descricao))
+            {
+                mensagemErro += " Descrição é obrigatório.";
+                sucesso = false;
+            }
+
+            if ( ! sucesso )
+            {
+                ViewBag.MensagemErro = mensagemErro;
                 return View(produtoModel);
-
             } else
             {
-                // UPDATE Produto SET .... WHERE ProdutoId = {produtoModel.id}
-
-                // Criar a mensagem de sucesso;
-
+                TempData["MensagemSucesso"] = $"Produto {produtoModel.Nome} alterado com sucesso";
                 return RedirectToAction(nameof(Index));
             }
             

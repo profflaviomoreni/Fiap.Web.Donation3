@@ -2,6 +2,12 @@
 
 <h1>Meus produtos</h1>
 
+
+@if (!string.IsNullOrEmpty(TempData["MensagemSucesso"] as string))
+{
+    <div class="alert alert-warning">@TempData["MensagemSucesso"]</div>
+}
+
 <p class="toolbar">
     <a href="#" class="create btn btn-dark">Novo produto</a>
 </p>

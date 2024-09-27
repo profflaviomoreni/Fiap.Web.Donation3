@@ -9,6 +9,9 @@
 
                 @if (!string.IsNullOrEmpty(ViewBag.MensagemErro))
                 {
+                    <script>
+                        window.alert('@ViewBag.MensagemErro');
+                    </script>
                     <div class="alert alert-danger">@ViewBag.MensagemErro</div>
                 }
 
