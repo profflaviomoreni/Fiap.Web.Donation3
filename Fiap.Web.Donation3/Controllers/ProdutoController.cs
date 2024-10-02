@@ -1,19 +1,52 @@
-﻿using Fiap.Web.Donation3.Models;
+﻿using Fiap.Web.Donation3.Data;
+using Fiap.Web.Donation3.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Fiap.Web.Donation3.Controllers
 {
     public class ProdutoController : Controller
     {
 
+        private readonly DataContext _dataContext;
+
+        public ProdutoController(DataContext dataContext)
+        {
+            _dataContext = dataContext;
+        }
+
+
         [HttpGet]
         public IActionResult Index()
         {
+
             // SELECT * FROM Produto
-            var listaProdutos = ListarProdutosMock();
+            var listaProdutos = _dataContext.Produtos.ToList();
 
             // Exibir a View de Listagem de Produtos
             return View(listaProdutos);
+        }
+
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View(new ProdutoModel());
+        }
+
+        [HttpPost]
+        public IActionResult Create(ProdutoModel produtoModel)
+        {
+            if ( ModelState.IsValid )
+            {
+                TempData["MensagemSucesso"] = $"Produto {produtoModel.Nome} cadastro com sucesso";
+                return RedirectToAction(nameof(Index));
+            } else
+            {
+                return View(produtoModel);
+            }
+
+            
         }
 
 

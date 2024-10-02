@@ -17,7 +17,7 @@ namespace Fiap.Web.Donation3.Models
         public string NomeCategoria { get; set; }
 
         [NotMapped]
-        public string Token { get; set; }
+        public string? Token { get; set; }
 
     }
 }
