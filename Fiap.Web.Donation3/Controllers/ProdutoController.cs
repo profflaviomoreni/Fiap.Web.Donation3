@@ -1,5 +1,6 @@
 ﻿using Fiap.Web.Donation3.Data;
 using Fiap.Web.Donation3.Models;
+using Fiap.Web.Donation3.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Operations;
 
@@ -8,11 +9,16 @@ namespace Fiap.Web.Donation3.Controllers
     public class ProdutoController : Controller
     {
 
-        private readonly DataContext _dataContext;
+        // Gambiarra do Flavio
+        private readonly int UserId = 1;
+
+        private readonly ProdutoRepository _produtoRepository;
+        private readonly CategoriaRepository _categoriaRepository;
 
         public ProdutoController(DataContext dataContext)
         {
-            _dataContext = dataContext;
+            _produtoRepository = new ProdutoRepository(dataContext);
+            _categoriaRepository = new CategoriaRepository(dataContext);
         }
 
 
@@ -21,7 +27,7 @@ namespace Fiap.Web.Donation3.Controllers
         {
 
             // SELECT * FROM Produto
-            var listaProdutos = _dataContext.Produtos.ToList();
+            var listaProdutos = _produtoRepository.FindAll();
 
             // Exibir a View de Listagem de Produtos
             return View(listaProdutos);
@@ -31,6 +37,8 @@ namespace Fiap.Web.Donation3.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.Categorias = _categoriaRepository.FindAll();
+
             return View(new ProdutoModel());
         }
 
@@ -39,10 +47,14 @@ namespace Fiap.Web.Donation3.Controllers
         {
             if ( ModelState.IsValid )
             {
+                produtoModel.UsuarioId = UserId;
+                _produtoRepository.Insert(produtoModel);
+
                 TempData["MensagemSucesso"] = $"Produto {produtoModel.Nome} cadastro com sucesso";
                 return RedirectToAction(nameof(Index));
             } else
             {
+                ViewBag.Categorias = _categoriaRepository.FindAll();
                 return View(produtoModel);
             }
 
@@ -53,9 +65,8 @@ namespace Fiap.Web.Donation3.Controllers
         [HttpGet]
         public IActionResult Editar(int id)
         {
-            // SELECT * FROM TB_PROD WHERE ProdutoID = {id} 
-            var produto = ListarProdutosMock().Where( p => p.ProdutoId == id).FirstOrDefault();
-
+            var produto = _produtoRepository.FindById(id);
+            ViewBag.Categorias = _categoriaRepository.FindAll();
             return View(produto);
         }
 
@@ -63,31 +74,30 @@ namespace Fiap.Web.Donation3.Controllers
         [HttpPost]
         public IActionResult Editar(ProdutoModel produtoModel)
         {
-            var sucesso = true;
-            var mensagemErro = "";
+            if ( ModelState.IsValid )
+            {
+                produtoModel.UsuarioId = UserId;
+                _produtoRepository.Update(produtoModel);
 
-            if (string.IsNullOrEmpty(produtoModel.Nome))
-            {
-                mensagemErro += "Nome do produto é obrigatório.";
-                sucesso = false;
-            }
-
-            if (string.IsNullOrEmpty(produtoModel.Descricao))
-            {
-                mensagemErro += " Descrição é obrigatório.";
-                sucesso = false;
-            }
-
-            if ( ! sucesso )
-            {
-                ViewBag.MensagemErro = mensagemErro;
-                return View(produtoModel);
-            } else
-            {
                 TempData["MensagemSucesso"] = $"Produto {produtoModel.Nome} alterado com sucesso";
                 return RedirectToAction(nameof(Index));
+            } else
+            {
+                ViewBag.Categorias = _categoriaRepository.FindAll();
+                ViewBag.MensagemErro = "Preencha todos os dados corretamente";
+                return View(produtoModel);
             }
             
+        }
+
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            _produtoRepository.Delete(id);
+
+            TempData["MensagemSucesso"] = $"Produto removido com sucesso";
+            return RedirectToAction(nameof(Index));
         }
 
 

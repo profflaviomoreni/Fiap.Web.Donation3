@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Fiap.Web.Donation3.Models
@@ -10,6 +11,7 @@ namespace Fiap.Web.Donation3.Models
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [HiddenInput]
         public int ProdutoId { get; set; }
 
         [Required(ErrorMessage = "O campo nome é obrigatório")]
