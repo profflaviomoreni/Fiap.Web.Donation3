@@ -12,6 +12,11 @@ namespace Fiap.Web.Donation3.Controllers
 
         private readonly ProdutoRepository _produtoRepository;
 
+        private readonly int UserId = 1;
+
+        private readonly bool Autenticado = true;
+
+
         public HomeController(ILogger<HomeController> logger, DataContext dataContext)
         {
             _logger = logger;
@@ -20,7 +25,15 @@ namespace Fiap.Web.Donation3.Controllers
 
         public IActionResult Index()
         {
-            var produtos = _produtoRepository.FindAllAvaliable();
+            var produtos = new List<ProdutoModel>();
+
+            if ( Autenticado )
+            {
+                produtos = _produtoRepository.FindAllAvaliableForChange(UserId);
+            } else
+            {
+                produtos = _produtoRepository.FindAllAvaliable();
+            }
 
             return View(produtos);
         }
